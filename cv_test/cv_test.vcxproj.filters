@@ -23,7 +23,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\..\..\..\..\Users\Andrei\Desktop\deva.jpeg">
+    <Image Include="megan.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
