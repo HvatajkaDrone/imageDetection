@@ -50,49 +50,94 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-CvSeq* getContours(char* filename, CvMemStorage* storage)
-{
-	IplImage* image = cvLoadImage(filename, 1);
-
-	image = cvCreateImage(cvGetSize(image), IPL_DEPTH_8U, 1);
-
-	cvConvertImage(image, image, CV_BayerRG2GRAY);
-	cvInRangeS(image, cvScalar(40), cvScalar(150), image);
-
-	CvSeq* contours = 0;
-
-	cvFindContours(image, storage, &contours, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0, 0));
-
-	return contours;
-}
+//void getContours(const char* filename, CvMemStorage* storage, CvSeq* contours)
+//{
+//	IplImage* image = cvLoadImage(filename);
+//
+//	cvNamedWindow("Binary", CV_WINDOW_AUTOSIZE);
+//	cvShowImage("Binary", image);
+//
+//	cvWaitKey(0);
+//	
+//	IplImage* bin = cvCreateImage(cvGetSize(image), 8, 1);
+//
+//	cvCanny(image, bin, 50, 200);
+//
+//	cvNamedWindow("Canny", CV_WINDOW_AUTOSIZE);
+//	cvShowImage("Canny", bin);
+//
+//	cvWaitKey(0);
+//
+//	int contoursCont = cvFindContours(bin, storage, &contours, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0, 0));
+//}
 
 int main()
 {
-	char* cont_name = "contour.jpg";
-	IplImage* cont_image = cvLoadImage(cont_name);
+	char* cont_name = "rect.jpg";
+	IplImage* image_contour = cvLoadImage(cont_name);
 
-	char* det_name = "shapes.jpg";
+	cvWaitKey(0);
+
+	char* det_name = "figures.jpg";
 	IplImage* det_image = cvLoadImage(det_name);
 
-	CvMemStorage* det_storage = cvCreateMemStorage(0);
-	CvSeq* det_contours = getContours("megan.jpg", det_storage);
-	
-	CvMemStorage* base_storage = cvCreateMemStorage(0);
-	CvSeq* cont_image = getContours("megan.jpg", base_storage);
+	cvWaitKey(0);
 
-	CvSeq* seqM = 0;
+	CvMemStorage* det_storage = cvCreateMemStorage(0);
+	CvSeq* det_contours = 0;
+	//getContours(det_name, det_storage, det_contours);
+	
+
+	IplImage* imageI = cvLoadImage(det_name);
+	IplImage* binI = cvCreateImage(cvGetSize(imageI), 8, 1);
+
+	cvCanny(imageI, binI, 50, 200);
+
+	cvFindContours(binI, det_storage, &det_contours, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0, 0));
+
+
+	CvMemStorage* base_storage = cvCreateMemStorage(0);
+	CvSeq* cont_image = 0; 
+	//getContours(cont_name, base_storage, cont_image);
+
+
+	IplImage* imageT = cvLoadImage(cont_name);
+	IplImage* binT = cvCreateImage(cvGetSize(imageT), 8, 1);
+
+	cvCanny(imageT, binT, 50, 200);
+
+	cvFindContours(binT, base_storage, &cont_image, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0, 0));
+
+
+	CvSeq* seqI = 0,
+		*seqT = 0;
 	double matchM = 1000;
 
 	// поиск лучшего совпадения контуров по их моментам 
-	for (CvSeq* seq0 = det_contours; seq0 != 0; seq0 = seq0->h_next){
-		double match0 = cvMatchShapes(seq0, cont_image, CV_CONTOURS_MATCH_I3);
-		if (match0 < matchM){
-			matchM = match0;
-			seqM = seq0;
+	for (CvSeq* seq0 = det_contours; seq0 != 0; seq0 = seq0->h_next)
+	{
+		for (CvSeq* seq1 = cont_image; seq1 != 0; seq1 = seq1->h_next)
+		{
+			double match0 = cvMatchShapes(seq0, seq1, CV_CONTOURS_MATCH_I3); //cvMatchShapes(seq0, cont_image, CV_CONTOURS_MATCH_I3);
+			if (match0 < matchM)
+			{
+				matchM = match0;
+
+				seqT = seq1;
+				seqI = seq0;
+			}
 		}
 	}
+	cvDrawContours(image_contour, seqT, CV_RGB(52, 201, 36), CV_RGB(36, 201, 197), 0, 2, 8);
+	cvDrawContours(det_image, seqI, CV_RGB(52, 201, 36), CV_RGB(36, 201, 197), 0, 2, 8);
 
-	cvDrawContours(, seqM, CV_RGB(52, 201, 36), CV_RGB(36, 201, 197), 0, 2, 8);
+	cvNamedWindow("Detection image", CV_WINDOW_AUTOSIZE);
+	cvShowImage("Detection image", det_image);
+
+	cvNamedWindow("Contour image", CV_WINDOW_AUTOSIZE);
+	cvShowImage("Contour image", image_contour);
+
+	cvWaitKey();
 
 	return 0;
 }
