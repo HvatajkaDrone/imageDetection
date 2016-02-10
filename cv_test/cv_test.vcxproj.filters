@@ -22,4 +22,18 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="contour.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="figures.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="rect.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="shapes.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

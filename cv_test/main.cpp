@@ -76,12 +76,8 @@ int main()
 	char* cont_name = "rect.jpg";
 	IplImage* image_contour = cvLoadImage(cont_name);
 
-	cvWaitKey(0);
-
 	char* det_name = "figures.jpg";
 	IplImage* det_image = cvLoadImage(det_name);
-
-	cvWaitKey(0);
 
 	CvMemStorage* det_storage = cvCreateMemStorage(0);
 	CvSeq* det_contours = 0;
